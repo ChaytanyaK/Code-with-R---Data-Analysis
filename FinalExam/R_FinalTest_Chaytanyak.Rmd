@@ -1,0 +1,263 @@
+---
+title: "R_FinalTest_ChaytanyaKumar"
+author: "Chaytanya"
+date: "12/16/2021"
+output:
+  word_document: default
+  html_document:
+    df_print: paged
+---
+
+```{r}
+
+
+library(tidyverse)
+library(stringr)  
+library(dplyr)
+library(ggplot2)
+library(tidyr)  
+library(reshape2)
+library(readr)
+library(forcats)
+
+#1)Using appropriate R code, read in the emailed excel spread sheet
+#Collegedata.  Use read_csv(“Collegedata.csv”)
+
+collegedata <- read_csv("Collegedata.csv")
+#view(collegedata)
+dim(collegedata)
+
+#2)
+#Given the level of the institution, does there appear to be an association between
+#the average cost of attendance(x variable) and the mean earnings of students six years
+#after graduation(y variable)? Make  appropriate plots to justify your response. 
+#(Hint: Generate two plots to make your decision, first a standard scatter plot involving 
+#the two continuous variables mentioned and then a facet plot over the appropriate categorical variable)
+
+college = collegedata%>%
+  filter(COSTT4_A !="PrivacySuppressed", MN_EARN_WNE_P6 !="PrivacySuppressed")
+
+ggplot(data = college)+
+  geom_point(mapping = aes(x=COSTT4_A, y=MN_EARN_WNE_P6))
+
+ggplot(data = college)+
+  geom_point(mapping = aes(x=COSTT4_A, y=MN_EARN_WNE_P6))+
+  facet_wrap(~ICLEVEL)
+
+#From the scatter plot we can say that there is moderate positive association, 
+#between the variables-average cost of attendance (x variable) and 
+#the mean earnings of students six years.The facetplot also shows that the graph
+#has upward trend.
+
+#3)Use r code to produce a histogram of the average age of entry. 
+#Comment on the distribution of this variable.
+
+
+collegedata2 = collegedata%>%
+select(AGE_ENTRY)%>%
+filter(AGE_ENTRY !="PrivacySuppressed" )
+collegedata2
+
+str(collegedata2)
+
+collegedata3<- as.numeric(collegedata2$AGE_ENTRY)
+hist(collegedata3)
+  
+# From the graph we can see that the distribution is slightly skewed to the left.
+#We can interpret that the majority of the cases for the average age of entry
+#are between 20 to 30 years old.
+
+#4)Use r code that will produce output that shows the 10 institutions that
+#have the highest average age of entry?
+
+
+x4<-collegedata%>%
+filter(AGE_ENTRY !="PrivacySuppressed" )%>%
+arrange(desc(AGE_ENTRY))%>%
+print(n=10)
+
+#view(x4)
+
+
+#5)There are many universities with "American University" in the name. E.g.
+#"American University of Puerto Rico" and "National American
+ #University-Ellsworth AFB Extension".  Use R code to create a data frame, called 
+#`americandf`, that contains just the data from universities with
+#"American University" in the name.
+
+x1<-str_subset(collegedata$INSTNM, "American University")
+#x1
+americandf<- collegedata%>%
+filter(INSTNM %in% x1)
+americandf
+#view(americandf)
+
+
+#6)
+#Provide r code that will produce the number of colleges from the College Score data frame
+#that have average SAT scores that are above 1000.  
+#( Do not produce the data frame.  Your code should only yield the number)
+
+
+collegedata%>%
+  select(INSTNM,SAT_AVG)%>%
+ filter(SAT_AVG > 1000)%>%
+ count()
+
+#7)Provide r code that will show a data frame that lists the 10 highest Average SAT scores in decreasing order. 
+#A partial data frame is given below.
+
+collegedata%>%
+arrange(desc(SAT_AVG))%>%
+print(n=10)
+
+#)8Using the gss_cat data frame, write r code that will produce the bar graph below. 
+#And explain in one or two sentences why the bar graph is difficult to interpret.
+
+gss_cat
+
+gss_cat
+ggplot(data = gss_cat)+
+geom_bar(mapping = aes(x=rincome))
+
+# as you can see, We are unable to read the labels of the levels of the 
+#salary (tightly coupled due to lack of space) 
+#and therefore it is difficult to interpret the Bar plot. 
+
+#9)a) Now write r code from the same data set that produce the transformed bar graph 
+#and comment on why it is an improvement.
+
+gss_cat
+ggplot(data = gss_cat)+
+geom_bar(mapping = aes(x=rincome))+
+coord_flip()
+
+# We can evidently see the difference between the two. The former was difficult to interpret due to
+#congested labels of the levels of salary while later one shows levels of the income more defined and 
+#easily to interpret after the co-oridinate flip.  
+
+
+
+#b)Use r code to produce the tips data frame from the reshape2 package. 
+#Name three categorical variables in the data frame.
+
+tips
+
+#view(tips)
+
+#Categorical variables are Fri,Sat, Sun,Thur from 'Day' column. Male and Female form 'Sex' ,
+#Lunch and Dinner from 'Time'.
+
+#10)Use r code to indicate how many levels exist for the factor day in the tips data frame
+#and determine the frequency of each level.
+
+tips%>%
+  group_by(day)%>%
+  count()
+
+#11)Produce r code that will produce the following histogram from the tips data frame
+
+
+ggplot(data = tips)+
+geom_histogram(mapping = aes(x=total_bill),color='white',binwidth = 2)
+
+
+#12)Write r code that will produce the following histograms from the tips data frame.
+
+ggplot(data = tips)+
+  geom_histogram(mapping = aes(x=total_bill), color = 'white',bins=2,binwidth = 2)+
+  facet_grid(sex~smoker)
+
+#13)Using the stringr::words data set along with str_subset code,
+#produce R code that will show a 9 letter word that has the letter a in the middle.  
+
+stringr::words
+str_subset(words, "....a....")
+
+#14)Produce a string that will force a match for the regular expression \\””\   
+#Use and show the R code command writelines to confirm your answer
+
+writeLines(" \\\\””\\\ ")
+
+
+#15)Describe in words (two or three sentences) what the following regular expression 
+#will match ^.*e$.
+
+str_subset(words, "^.*e$") 
+
+#The following above regular expression is fetching all the words that ends with "e" 
+#irrespective of the length of the string. 
+
+#16)Using the methods demonstrated in class regarding  Factors and Forcats,  
+#use and show R code to create a factor that will enable you to sort the string vector 
+#(“eight”, “four”, “ten”, “two”)
+#according to quantity, not alphabetical order. 
+
+x <- c("eight", "four", "ten", "two")
+sort(x)
+
+SortQunatity= c("two", "four", "eight", "ten")
+x1 = factor(x,levels = SortQunatity)
+sort(x1)
+  
+#17)Using the mpg data set, use and show R code that will produce a table that shows the
+#average city mileage (mean for cty) for each manufacturer.
+
+#view(mpg)
+
+mpgdata <- mpg %>%
+  group_by(manufacturer) %>%
+  summarise(MeanCity = mean(cty))
+mpgdata
+
+
+#18)Using the mpg data set and methods and code illustrated in the emailed Factors and Forcats R file:
+#use and show R code to generate a scatter plot that clearly shows how different manufacturers compare 
+#with one another with regards to average or mean city mileage (cty) 
+
+ggplot(data = mpgdata)+
+  geom_point(mapping = aes(x=MeanCity, y = manufacturer))
+
+ggplot(data = mpgdata) +
+  geom_point(mapping = aes(x=MeanCity,
+                           y = fct_reorder(manufacturer,MeanCity),color='red'))
+
+
+#19)To the mpg data table, apply a stringr function to print all observations of the
+#manufacturer variable in upper case letters. Thenuse R coding to produce rows 15 to 25.  
+#The first five rows of the table are shown below. 
+#Note that the row numbers 1 – 5 correspond to rows 15 – 20.
+
+mpg$manufacturer<-str_to_upper(mpg$manufacturer)
+mpg
+
+mpgdata2<- mpg%>%
+  select(manufacturer, model, year)%>%
+  slice(15:25)
+
+mpgdata2
+
+
+#20)To the diamonds data table, apply R code to produce the table give below.
+#Note that the variable name color has been changed to Color
+
+diamonds
+
+diamond1 <- diamonds%>%
+  group_by(color)%>%
+  count()%>%
+  rename(Color = 'color', Frequency = 'n')%>%
+  arrange(desc(Frequency))
+
+diamond1
+
+#21)  Now using the table produced in problem 20 and ggplot coding, produce the bar graph shown below.
+
+
+ggplot(data=diamond1)+
+  geom_bar(mapping = aes(y = Frequency,x=Color,fill=Color),stat="identity")
+
+
+
+```
+
